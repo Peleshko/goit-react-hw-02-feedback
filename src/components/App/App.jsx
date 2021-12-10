@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import Feedbacks from '../Feedbacks';
-import Section from '../Section';
 import Statistics from '../Statistics';
+import Notification from '../Notification';
+import s from './App.module.css';
 
 export default class App extends Component {
   state = {
@@ -11,10 +12,7 @@ export default class App extends Component {
   };
 
   countTotalFeedback() {
-    return Object.values(this.state).reduce((acc, stat) => {
-      acc += stat;
-      return acc;
-    }, 0);
+    return Object.values(this.state).reduce((acc, stat) => acc + stat, 0);
   }
 
   countPositiveFeedbackPercentage() {
@@ -26,21 +24,24 @@ export default class App extends Component {
   };
 
   render() {
-    const { good, neutral, bad } = this.state;
+    const options = Object.keys(this.state);
+    const total = this.countTotalFeedback();
+    const percent = this.countPositiveFeedbackPercentage();
+    const statistics = Object.entries(this.state);
+
     return (
-      <Section title="Please, leave yours feedback">
-        <Feedbacks
-          options={Object.keys(this.state)}
-          onLeaveFb={this.handleClickBtn}
-        />
-        <Statistics
-          good={good}
-          neutral={neutral}
-          bad={bad}
-          total={this.countTotalFeedback()}
-          positivePercentage={this.countPositiveFeedbackPercentage()}
-        />
-      </Section>
+      <div className={s.container}>
+        <h1 className={s.title}>Please, leave yours feedback</h1>
+        <Feedbacks options={options} onLeaveFb={this.handleClickBtn} />
+        {total > 0 && (
+          <Statistics
+            statistics={statistics}
+            total={total}
+            positivePercentage={percent}
+          />
+        )}
+        {!total > 0 && <Notification message="There is no feedback" />}
+      </div>
     );
   }
 }
